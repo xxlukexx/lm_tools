@@ -1,5 +1,6 @@
 function out = cell2char(in)
 
+    if ischar(in), out = in; return, end
     if ~iscell(in), error('Input must be cell.'), end
 
     out = '';
