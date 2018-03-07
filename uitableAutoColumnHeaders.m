@@ -1,5 +1,11 @@
-function uitableAutoColumnHeaders(h)
+function uitableAutoColumnHeaders(h, multiplier)
 
+    if ~exist('multiplier', 'var') || isempty(multiplier)
+        multiplier = 1;
+    elseif ~isnumeric(multiplier) && ~iscalar(multiplier)
+        error('multiplier argument must be a numeric scalar.')
+    end
+    
     % get column headers and data
     hdr = get(h, 'ColumnName');
     tab = get(h, 'Data');
@@ -38,12 +44,18 @@ function uitableAutoColumnHeaders(h)
     end
     
     % collapse rows to get max width of any cell in each col
-    width = max(widths);
+    width_hdr = widths(1, :);
+    if size(widths, 1) > 1
+        width_dta = max(widths(2:end, :) * multiplier, 1);
+    else
+        width_dta = [];
+    end
+    width_max = max([width_hdr; width_dta]);
     
     % assume 8 px per char, calculate width in px
-    width_px = width * (.8 * get(h, 'FontSize'));
+    width_px = width_max * (.8 * get(h, 'FontSize'));
     
     % set widths in uitable
-    set(h, 'ColumnWidth', num2cell(width_px));
+    set(h, 'ColumnWidth', num2cell(width_px * multiplier));
     
 end
