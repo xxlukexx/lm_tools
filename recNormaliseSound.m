@@ -8,6 +8,6 @@ function recNormaliseSound(path_in)
     validFormat = ismember(lower(ext), lower(audioFormats));
     files(~validFormat) = [];
     % normalise
-    [pre, post] = cellfun(@(x) normaliseSound(x, -23), files, 'uniform', false);
+    [pre, post] = cellfun(@(x) normaliseSound(x, -30), files, 'uniform', false);
     
 end

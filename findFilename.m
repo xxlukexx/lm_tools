@@ -1,7 +1,7 @@
-function [found] = findFilename(fileName, filePath)
+function found = findFilename(fileName, filePath)
 
-    d = dir(filePath);
-    found = [];
+    d = jdir(filePath);
+    found = {};
     
     for curFile = 1:size(d, 1)
         
@@ -15,5 +15,7 @@ function [found] = findFilename(fileName, filePath)
         end
         
     end
+    
+    if length(found) == 1, found = found{1}; end
     
 end

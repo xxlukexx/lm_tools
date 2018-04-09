@@ -16,8 +16,8 @@ function c = extractNumeric(c)
     c(ch) = cellfun(@(x) str2double(regexp(x, '\d*', 'match')), c(ch),...
         'uniform', false);
     
-    % convert numeric to cell
-    nm = cellfun(@isnumeric, c);
-    c(nm) = cellfun(@num2cell, c(nm), 'uniform', false);
+%     % convert numeric to cell
+%     nm = cellfun(@isnumeric, c);
+%     c(nm) = cellfun(@num2cell, c(nm), 'uniform', false);
     
 end
