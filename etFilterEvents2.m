@@ -1,4 +1,4 @@
-function [eb_filt, idx] = etFilterEvents2(eb, mask)
+function [eb_filt, found] = etFilterEvents2(eb, mask)
 % eb_filt = ETFILTEREVENTS2(eb, mask) filters event buffer eb using mask,
 % and returns the filtered events in eb_filt.
 %

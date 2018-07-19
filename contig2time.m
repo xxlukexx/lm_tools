@@ -1,4 +1,4 @@
-function ctt = contig2time(ct, time)
+function [ctt, ct] = contig2time(ct, time)
     if isempty(ct), ctt = []; return, end
     % take just onsets/offsets (not duration)
     ctt = ct(:, 1:2);
@@ -12,8 +12,11 @@ function ctt = contig2time(ct, time)
     misd = median(diff(time));
     time(end + 1) = time(end) + misd;
     % check samples are in bounds
-    if any(ct(:) > length(time))
-        error('Samples out of bounds.')
+    if any(ctt(:) > length(time))
+        warning('Samples out of bounds - will ignore samples outside range of time vector.')
+        outIdx = any(ctt > length(time), 2);
+        ctt(outIdx, :) = [];
+        ct(outIdx, :) = [];
     end
     % look up time
     ctt(:, 1) = time(ctt(:, 1));
