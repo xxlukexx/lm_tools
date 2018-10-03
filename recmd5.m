@@ -1,7 +1,23 @@
 function hash = recmd5(pth)
 
+    % determine if path or file
+    if exist(pth, 'file')
+        type = 'file';
+    elseif exist(pth, 'dir')
+        type = 'dir';
+    else
+        error('Path not recognised as file or folder.')
+    end
+
     % get files and file info
-    files = recdir(pth, '-silent');
+    switch type
+        case 'file'
+            % just one file - put in cell array
+            files = {pth};
+        case 'dir'
+            % folder - recursively search for files
+            files = recdir(pth, '-silent');
+    end
     info = cellfun(@dir, files, 'uniform', false);
     
     % check for empty (as in, non-readable) file info

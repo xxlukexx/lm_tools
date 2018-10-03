@@ -1,4 +1,4 @@
-function [expPath, dataPath, googleDrivePath, serverPath] =...
+function [expPath, dataPath, googleDrivePath, serverPath, devPath] =...
     getExperimentsPath
 
     %% experiments
@@ -68,6 +68,22 @@ function [expPath, dataPath, googleDrivePath, serverPath] =...
         serverPath = posData(ex(1));
     else
         serverPath = posData{ex};
+    end
+    
+    %% dev
+    posDev = {...
+            '/Users/luke/Google Drive/dev',...
+            '/Users/lukemason/Google Drive/dev',...
+            'C:\Users\lmason\Google Drive\dev',...
+        };
+    
+    ex = cellfun(@(x) exist(x, 'dir'), posDev);
+    ex = ex ~= 0;
+    
+    if sum(ex) > 1
+        devPath = posDev(ex(1));
+    else
+        devPath = posDev{ex};
     end
     
 end

@@ -14,6 +14,10 @@ function [dc] = checkDataIn(data)
             clear data;
         elseif ischar(data) && exist(data, 'dir') 
             dc = ECKDataContainer(data);        % if char, attempt to load
+        elseif isstruct(data) 
+            data = ECKStruct2ECKData(data);     % attempt to convert
+            dc = ECKDataContainer;              % create DC
+            dc.AddData(data);                   % add this data to it
         else
             error('data argument passed in wrong format - must be string path, ECKData or ECKDataContainer.')
         end
