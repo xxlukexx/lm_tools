@@ -1,13 +1,21 @@
-classdef hstruct < handle
+classdef logicalstruct 
     
     properties (Access = private)
-        data
+        data = struct
     end
     
     methods
         
-        function obj = hstruct(varargin)
-            obj.data = struct(varargin{:});
+        function obj = logicalstruct(varargin)
+            % create lstruct from either struct or fieldname/value string
+            % pairs
+            if numel(varargin) == 1 && isstruct(varargin{1})
+                obj.data = varargin{1};
+            elseif iscellstr(varargin)
+                obj.data = struct(varargin{:});
+%             else
+%                 error('Initialise this class with either a struct or fieldname/value string pairs.')
+            end
         end
         
         function obj = subsasgn(obj, s, varargin)
@@ -19,14 +27,31 @@ classdef hstruct < handle
         end
         
         function varargout = subsref(obj, s)
-            varargout = {builtin('subsref', obj.data, s)};
+            if length(s) == 1 && strcmpi(s.type, '.') 
+                if isempty(obj.data) || ismember(s.subs, fieldnames(obj.data))
+                    % field exists, get value
+                    val = builtin('subsref', obj.data, s);
+%                     if islogical(val)
+%                         % value is logical, return it
+                        varargout = {val};
+%                     else
+%                         % value is not logical, but field does exist,
+%                         % return true
+%                         varargout = {true};
+%                     end
+                    %                     varargout = {builtin('subsref', obj.data, s)};
+                else
+                    % field does not exist, return false
+                    varargout = {false};
+                end
+            end
         end
         
         function disp(obj)
             if isempty(obj.data)
-                fprintf('<strong>  hstruct</strong> with no fields.\n\n')
+                fprintf('<strong>  logicalstruct</strong> with no fields.\n\n')
             else
-                fprintf('<strong>  hstruct</strong> with fields:\n\n')
+                fprintf('<strong>  logicalstruct</strong> with fields:\n\n')
             end
             builtin('disp', obj.data)
         end
@@ -62,6 +87,10 @@ classdef hstruct < handle
         
         function val = struct2cell(obj)
             val = struct2cell(struct(obj));
+        end
+        
+        function val = struct2table(obj)
+            val = struct2table(struct(obj));
         end
         
         function properties(obj)

@@ -1,9 +1,9 @@
 function hash = recmd5(pth)
 
     % determine if path or file
-    if exist(pth, 'file')
+    if exist(pth, 'file') == 2
         type = 'file';
-    elseif exist(pth, 'dir')
+    elseif exist(pth, 'dir') == 7
         type = 'dir';
     else
         error('Path not recognised as file or folder.')
