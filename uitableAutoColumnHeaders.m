@@ -11,7 +11,7 @@ function uitableAutoColumnHeaders(h, multiplier)
     tab = get(h, 'Data');
     
     % preallocate
-    numCols = length(hdr);
+    numCols = size(tab, 2);
     numRows = size(tab, 1);
     widths = zeros(numRows + 1, numCols);
     
@@ -33,8 +33,23 @@ function uitableAutoColumnHeaders(h, multiplier)
             if iscell(val), val = val{:}; end
             if isnumeric(val), val = num2str(val); end
             
-            if ischar(val) && ~isempty(strfind(val, 'html'))
-                val = 'XXXXXXXX';
+            % if cell contains HTML tags, remove these
+            if ischar(val) && instr(lower(val), '<html>')
+                % find tags
+                i1 = strfind(val, '<');
+                i2 = strfind(val, '>');
+                if length(i1) == length(i2)
+                    % mark tags for removal
+                    for t = 1:length(i1)
+                        val(i1(t):i2(t)) = '#';
+                    end
+                end
+                
+                % remove tags
+                val = strrep(val, '#', '');
+                % remove spaces
+                val = strrep(val, ' ', '');
+                
             end
                 
             widths(r + 1, c) = length(val);
@@ -53,7 +68,7 @@ function uitableAutoColumnHeaders(h, multiplier)
     width_max = max([width_hdr; width_dta]);
     
     % assume 8 px per char, calculate width in px
-    width_px = width_max * (.8 * get(h, 'FontSize'));
+    width_px = width_max * (.6 * get(h, 'FontSize'));
     
     % set widths in uitable
     set(h, 'ColumnWidth', num2cell(width_px * multiplier));
