@@ -1,14 +1,22 @@
 function s = structFieldsToLowercase(s)
+% make struct fieldnames lowercase, by converting to cell, adjusting the
+% fieldnames, then converting the cell back to struct
 
     fnames_orig = fieldnames(s);                                            % get original fieldnames
-    fnames_lower = lower(fnames_orig);                                      % make lowercase names
-    numFields = length(fnames_orig);
+    fnames_lower = lower(fnames_orig); 
     
-    for f = 1:numFields                                                     % loop through all fields
-        if ~strcmp(fnames_orig{f}, fnames_lower{f})                         % only change if current name ISN'T all lowercase
-            s.(fnames_lower{f}) = s.(fnames_orig{f});                       % add new lowercase field
-            s = rmfield(s, fnames_orig{f});                                 % remove old field
-        end
+    % rename duplicates
+    fnames_lower = appendIndexToDuplicates(fnames_lower);
+    
+    fnames = fieldnames(s);
+    for i = 1:length(fnames)
+        renameStructField(s, fnames{i}, fnames_lower{i});
     end
+    
+%     % detect hstruct
+%     ishstruct = isa(s, 'hstruct');
+%     c = struct2cell(s);
+%     s = cell2struct(c, fnames_lower);
+%     if ishstruct, s = hstruct(s); end
     
 end

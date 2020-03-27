@@ -64,6 +64,11 @@ classdef hstruct < handle
             val = struct2cell(struct(obj));
         end
         
+        function val = renameStructField(obj, old, new)
+            obj.data = renameStructField(obj.data, old, new);
+            val = obj;
+        end
+        
         function properties(obj)
             builtin('properties', obj.data)
         end           

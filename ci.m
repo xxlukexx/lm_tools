@@ -1,9 +1,7 @@
-function [lower, upper] = ci(x)
+function CI = ci(x)
 
-    SEM = nanstd(x)/sqrt(length(x));            
-    ts = tinv([0.025  0.975],length(x)-1);     
-    CI = nanmean(x) + ts*SEM;    
-    lower = CI(1);
-    upper = CI(2);
+SEM = std(x)/sqrt(length(x));               % Standard Error
+ts = tinv([0.025  0.975],length(x)-1);      % T-Score
+CI = mean(x) + ts*SEM;                      % Confidence Intervals
 
 end

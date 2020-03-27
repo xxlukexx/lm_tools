@@ -8,6 +8,13 @@ function text = uitableColourCell(text, col)
         text = cellfun(@(t, c) uitableColourCell(t, c), text, col_cell,...
             'uniform', false);
         return
+    elseif iscellstr(text) && ismatrix(text) && isvector(col)
+        for r = 1:size(text, 1)
+            for c = 1:size(text, 2)
+                text{r, c} = uitableColourCell(text{r, c}, col);
+            end
+        end
+        return
     end
 
     col = uint8(col * 255);

@@ -1,6 +1,6 @@
-function sem = nansem(X)
+function sem = nansem(X, varargin)
 
-    sd  = nanstd(X);
+    sd  = nanstd(X, varargin{:});
     N   = length(X);
     sem = sd / sqrt(N);
     

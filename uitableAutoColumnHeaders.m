@@ -10,10 +10,15 @@ function uitableAutoColumnHeaders(h, multiplier)
     hdr = get(h, 'ColumnName');
     tab = get(h, 'Data');
     
+    if isempty(tab), return, end
+    
     % preallocate
     numCols = size(tab, 2);
     numRows = size(tab, 1);
     widths = zeros(numRows + 1, numCols);
+    
+    % flag for table input (vs cell)
+    isTab = istable(tab);
     
     % get width of each cell
     for c = 1:numCols
@@ -29,7 +34,12 @@ function uitableAutoColumnHeaders(h, multiplier)
             
         for r = 1:numRows
             
-            val = tab(r, c);
+            if ~isTab
+                val = tab(r, c);
+            else
+                val = tab{r, c};
+            end
+            
             if iscell(val), val = val{:}; end
             if isnumeric(val), val = num2str(val); end
             

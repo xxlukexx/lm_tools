@@ -13,7 +13,9 @@ function out = cell2char(in, replaceChar)
         if ischar(val)
             out = [out, replaceChar, val];
         elseif isnumeric(val)
-            out = [out, replaceChar, num2str(val)];
+            for ii = 1:length(val)
+                out = [out, replaceChar, num2str(val(ii))];
+            end
         elseif iscell(val)
             subVal = cell2char(val);
             out = [out, replaceChar, subVal];
