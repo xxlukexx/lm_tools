@@ -1,4 +1,4 @@
-function c = extractNumeric(c)
+function [c, m] = extractNumeric(c)
 
     % check input is cell array
     if ~iscell(c) && ~ischar(c)
@@ -22,6 +22,12 @@ function c = extractNumeric(c)
     % process
     c(ch) = cellfun(@(x) str2double(regexp(x, '\d*', 'match')), c(ch),...
         'uniform', false);
+    
+    % make a numeric vector with NaN in non-numeric cells, and numbers in
+    % numeric cells
+    idx_num = cellfun(@(x) isnumeric(x) & ~isempty(x) && isscalar(x), c);
+    m = nan(size(c));
+    m(idx_num) = cell2mat(c(idx_num));
     
     if convertBackFromCell
         c = c{1};

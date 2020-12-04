@@ -1,4 +1,4 @@
-function result = GetGoogleSpreadsheet(DOCID)
+function result = GetGoogleSpreadsheet(DOCID, GID)
 % result = GetGoogleSpreadsheet(DOCID)
 % Download a google spreadsheet as csv and import into a Matlab cell array.
 %
@@ -17,7 +17,13 @@ function result = GetGoogleSpreadsheet(DOCID)
 
 
 loginURL = 'https://www.google.com'; 
-csvURL = ['https://docs.google.com/spreadsheet/ccc?key=' DOCID '&output=csv&pref=2'];
+
+if exist('GID', 'var')
+    csvURL = ['https://docs.google.com/spreadsheet/ccc?key=' DOCID '&gid=' GID '&output=csv&pref=2'];
+else
+    csvURL = ['https://docs.google.com/spreadsheet/ccc?key=' DOCID '&output=csv&pref=2'];
+end
+
 
 %Step 1: go to google.com to collect some cookies
 cookieManager = java.net.CookieManager([], java.net.CookiePolicy.ACCEPT_ALL);
@@ -38,15 +44,28 @@ end
 
 function data = parseCsv(data)
 % splits data into individual lines
-data = textscan(data,'%s','whitespace','\n');
-data = data{1};
-for ii=1:length(data)
-   %for each line, split the string into its comma-delimited units
-   %the '%q' format deals with the "quoting" convention appropriately.
-   tmp = textscan(data{ii},'%q','delimiter',',');
-   data(ii,1:length(tmp{1})) = tmp{1};
+data = split(data,sprintf('\r\n')); % sdv 2017-12-15
+% data = textscan(data,'%s','whitespace','\n'); % this does not work in general: cannot process data that has single \n or \r within cells
+if isempty(data{end}) % trim any empty last line % sdv 2017-12-15
+data = data(1:end-1);
 end
 
+for ii=1:length(data)
+%for each line, split the string into its comma-delimited units
+%the '%q' format deals with the "quoting" convention appropriately.
+tmp = textscan(data{ii},'%q','delimiter',',');
+data(ii,1:length(tmp{1})) = tmp{1};
+end
+% function data = parseCsv(data)
+% % splits data into individual lines
+% data = textscan(data,'%s','whitespace','\n');
+% data = data{1};
+% for ii=1:length(data)
+%    %for each line, split the string into its comma-delimited units
+%    %the '%q' format deals with the "quoting" convention appropriately.
+%    tmp = textscan(data{ii},'%q','delimiter',',');
+%    data(ii,1:length(tmp{1})) = tmp{1};
+% end
 end
 
 function out = readstream(inStream)

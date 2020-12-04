@@ -14,6 +14,8 @@ function res = dbsparsefun(fcn, c, varargin)
                 out = false;
             elseif ~islogical(out)
                 out = true;
+            elseif ~isscalar(out)
+                out = false;
             end
             res(i) = out;
         end

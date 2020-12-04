@@ -12,9 +12,11 @@ function fixed = fixTableVariableNames(broken)
     % find and rename dups
     [u, i, s] = unique(broken);
     for q = 1:length(u)
-        if sum(s == q) > 1
-            for d = 2:sum(s== q)
-                broken{d} = sprintf('%s_%0d', broken{d}, d);
+        idx_dup = find(s == q);
+        numDups = length(idx_dup);
+        if numDups > 1
+            for d = 2:numDups
+                broken{idx_dup(d)} = sprintf('%s_%0d', broken{idx_dup(d)}, d);
             end
         end
     end

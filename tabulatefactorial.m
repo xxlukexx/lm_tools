@@ -1,4 +1,10 @@
-function out = tabulatefactorial(tab, rowVar, colVar)
+function [out, out_formatted] = tabulatefactorial(tab, rowVar, colVar)
+
+    % support multiple row/col vars
+    if iscell(colVar)
+        tab.colsig = makeSig(tab, colVar);
+        colVar = 'colsig';
+    end
 
     % get subs row rows and cols, count occurences
     [row_u, ~, row_s] = unique(tab.(rowVar));
@@ -15,8 +21,15 @@ function out = tabulatefactorial(tab, rowVar, colVar)
     end
     
     % make var names
-    varNames_count =  arrayfun(@(x) sprintf('N_%d', x), col_u, 'UniformOutput', false);
-    varNames_perc =  arrayfun(@(x) sprintf('Perc_%d', x), col_u, 'UniformOutput', false);
+    if iscell(col_u)
+        varNames_count =  cellfun(@(x) sprintf('N_%s', x), col_u, 'UniformOutput', false);
+        varNames_perc =  cellfun(@(x) sprintf('Perc_%s', x), col_u, 'UniformOutput', false);
+    elseif isnumeric(col_u) || islogical(col_u)
+        varNames_count =  arrayfun(@(x) sprintf('N_%d', x), col_u, 'UniformOutput', false);
+        varNames_perc =  arrayfun(@(x) sprintf('Perc_%d', x), col_u, 'UniformOutput', false);
+    else
+        error('Column values are not cell or numeric.')
+    end
     varNames = [varNames_count', varNames_perc'];
 
     % make output table with counts
@@ -34,6 +47,16 @@ function out = tabulatefactorial(tab, rowVar, colVar)
     [~, so] = sort(sum(m_count, 2), 'descend');
     out = out(so, :);
     
-    if nargin == 0, disp(out), end
+    switch nargout
+        case 0
+            disp(out)
+        case 2
+            % make formatted table
+            c_formatted = cellfun(@(n, prc) sprintf('%d (%s)', n, prc),...
+                num2cell(m_count), c_perc, 'uniform', false);
+            out_formatted = cell2table(c_formatted(so, :), 'RowNames',...
+                out.Properties.RowNames, 'VariableNames', varNames_count);
+    end
+    
     
 end

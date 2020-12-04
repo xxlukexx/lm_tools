@@ -8,9 +8,8 @@ function s = structFieldsToLowercase(s)
     % rename duplicates
     fnames_lower = appendIndexToDuplicates(fnames_lower);
     
-    fnames = fieldnames(s);
-    for i = 1:length(fnames)
-        renameStructField(s, fnames{i}, fnames_lower{i});
+    for i = 1:length(fnames_orig)
+        s = renameStructField(s, fnames_orig{i}, fnames_lower{i});
     end
     
 %     % detect hstruct

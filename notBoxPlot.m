@@ -411,8 +411,11 @@ function [h,statsOut]=myPlotter(X,Y)
         C=cols(k,:);
         J=(rand(size(thisX))-0.5)*jitter;
 
-        h(k).data=plot(thisX+J, thisY, 'o', 'color', C,...
-                       'markerfacecolor', C+(1-C)*0.65);
+%         h(k).data=plot(thisX+J, thisY, 'o', 'color', C,...
+%                        'markerfacecolor', C+(1-C)*0.65);
+        h(k).data = scatter(thisX+J, thisY, 'MarkerEdgeColor', C,...
+            'Marker', 'o', 'MarkerFaceColor', C+(1-C)*0.65);
+                   
     end  %for k=1:length(X)
 
 
