@@ -1,4 +1,4 @@
-function [tab, t_cell, d_cell, td_cell] = factcomp(tab, measure, varargin)
+function [tab, t_cell, d_cell, td_cell, grp_desc] = factcomp(tab, measure, varargin)
 
     parser      =   inputParser;
     checkField  =   @(x) any(strcmpi(tab.Properties.VariableNames, x)   );
@@ -35,6 +35,7 @@ function [tab, t_cell, d_cell, td_cell] = factcomp(tab, measure, varargin)
     df = [];
     tstat = [];
     effect = {};
+    CI = [];
         
     % do t-test for each row/col
     p = nan(numRow, numCol);
@@ -64,7 +65,11 @@ function [tab, t_cell, d_cell, td_cell] = factcomp(tab, measure, varargin)
             else
                 warning('Results table not calculated for rows and cols - fix this!')
             end
-
+            
+            % 95% CI
+            for cmp = 1:numComp
+                CI(r, c, cmp, :) = ci(tmp.(measure)(comp_s == cmp));
+            end
         end
     end
 
@@ -79,8 +84,7 @@ function [tab, t_cell, d_cell, td_cell] = factcomp(tab, measure, varargin)
     % format results in table
     tab_t = cell2table(t_cell, 'RowNames', row_u, 'VariableNames', col_u);      
 
-        
-    %% cohen's d
+%% cohen's d
         
     % calculate d for each row/col
     d = nan(numRow, numCol);
@@ -125,6 +129,11 @@ function [tab, t_cell, d_cell, td_cell] = factcomp(tab, measure, varargin)
     tab.(sprintf('sd_%s', comp_u{1})) = reshape(sd(:, :, 1), [], 1);
     tab.(sprintf('sd_%s', comp_u{2})) = reshape(sd(:, :, 2), [], 1);    
     
+    tab.(sprintf('CI05_%s', comp_u{1})) = reshape(CI(:, :, 1, 1), [], 1);
+    tab.(sprintf('CI95_%s', comp_u{1})) = reshape(CI(:, :, 1, 2), [], 1);
+    tab.(sprintf('CI05_%s', comp_u{2})) = reshape(CI(:, :, 2, 1), [], 1);
+    tab.(sprintf('CI95_%s', comp_u{2})) = reshape(CI(:, :, 2, 2), [], 1);
+    
     tab.mean_diff = reshape(meanDiff, [], 1);
     tab.sd_pooled = reshape(sdp, [], 1);
     tab.t = reshape(tstat, [], 1);
@@ -149,8 +158,14 @@ function [tab, t_cell, d_cell, td_cell] = factcomp(tab, measure, varargin)
     
 %% table of stats for each group
 
-    
-    
+    for cmp = 1:numComp
+        grp_desc{cmp} = sprintf('%s: Mean=%.3f, SD=%.3f, 95%% CI=%.3f-%.3f',...
+            comp_u{cmp},...
+            reshape(mu(:, :, cmp), [], 1),...
+            reshape(sd(:, :, cmp), [], 1),...
+            reshape(CI(:, :, cmp, 1), [], 1),...
+            reshape(CI(:, :, cmp, 2), [], 1));
+    end
 
 end
 
