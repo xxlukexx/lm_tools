@@ -1,5 +1,7 @@
 function out = cell2char(in, replaceChar)
 
+    if isempty(in), out = []; return, end
+        
     if ~exist('replaceChar', 'var') || isempty(replaceChar)
         replaceChar = '_';
     end
@@ -22,6 +24,6 @@ function out = cell2char(in, replaceChar)
         end
     end
     
-    if strcmpi(out(1), replaceChar), out = out(2:end); end
+    if strcmpi(out(1:length(replaceChar)), replaceChar), out = out(length(replaceChar) + 1:end); end
 
 end

@@ -22,6 +22,14 @@ classdef hstruct < handle
             varargout = {builtin('subsref', obj.data, s)};
         end
         
+        function val = length(obj)
+            val = length(obj.data);
+        end
+        
+        function val = size(obj, varargin)
+            val = size(obj.data, varargin{:});
+        end
+        
         function disp(obj)
             if isempty(obj.data)
                 fprintf('<strong>  hstruct</strong> with no fields.\n\n')
@@ -63,6 +71,10 @@ classdef hstruct < handle
         function val = struct2cell(obj)
             val = struct2cell(struct(obj));
         end
+        
+%         function val = numel(obj)
+%             val = numel(obj.data);
+%         end
         
         function val = renameStructField(obj, old, new)
             obj.data = renameStructField(obj.data, old, new);

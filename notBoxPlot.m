@@ -20,7 +20,7 @@ function varargout=notBoxPlot(y,x,varargin)
 % y - A vector, matrix, or table of the data to plot. 
 %      * vector and no x is provided: all data are grouped at one x position.
 %      * matrix and no x is provided: each column is plotted in a different x position. 
-%      * vector with x grouping variable provided: data grouped accordig to x
+%      * vector with x grouping variable provided: data grouped according to x
 %      * a Table is treated such that the first column is y and the second x.
 %      * a LinearModel produced by fitlm
 %
@@ -34,11 +34,11 @@ function varargout=notBoxPlot(y,x,varargin)
 % behaves like boxplot (see Example 5).
 %
 %
-% Parameter/Value paies
+% Parameter/Value pairs
 % 'jitter' - how much to jitter the data for visualization
 %          (optional). The width of the boxes are automatically
-%          scaled to the jitter magnitude. If jetter is empty or
-%          missing then a default value is used. 
+%          scaled to the jitter magnitude. If jitter is empty or
+%          missing then a default value of 0.3 is used. 
 %
 % 'style' - a string defining plot style of the data.
 %        'patch' [default] - plots 95% SEM (by default, see below) and SD as a 
@@ -95,6 +95,12 @@ function varargout=notBoxPlot(y,x,varargin)
 %
 %  For more run:
 %   NBP.statsOptionsExamples
+%
+% 4 - Overlaying different notBoxPlots on one axis
+% >> clf
+% >> hold on
+% >> for ii=1:8; notBoxPlot(rand(1,ii*10),ii), end 
+%
 %
 % Rob Campbell - August 2016
 %
@@ -179,7 +185,7 @@ otherwise %Otherwise Y is a vector or a matrix
         y=y(:); 
     end
 
-    % Handle case where user doesn't supply X, but have user param/val pairs. e.g.
+    % Handle case where user doesn't supply X, but there are user-supplied param/val pairs. e.g.
     % notBoxPlot(rand(20,5),'jitter',0.5)
     if nargin>2 && ischar(x)
         varargin=[x,varargin];
@@ -208,7 +214,7 @@ params.CaseSensitive = false;
 %User-visible options
 params.addParameter('jitter', 0.3, @(x) isnumeric(x) && isscalar(x));
 params.addParameter('style','patch', @(x) ischar(x) && any(strncmpi(x,{'patch','line','sdline'},4)) );
-params.addParameter('interval','SEM', @(x) ischar(x) && any(strncmpi(x,{'sem','tinterval'},inf)) );
+params.addParameter('interval','SEM', @(x) ischar(x) && any(strncmpi(x,{'sem','tinterval'},4)) );
 params.addParameter('markMedian', false, @(x) islogical(x));
 
 %Options hidden from the user
@@ -242,7 +248,6 @@ if jitter==0 && strcmp(style,'patch')
 end
 
 
-
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 % We now loop through the unique x values, plotting each notBox in turn
 % using recursive calls to notBoxPlot.
@@ -264,7 +269,7 @@ if isvector(y) && isvector(x) && length(x)>1
             thisCI =[];
         end
 
-        h(ii)=notBoxPlot(y(f),u(ii),varargin{:},'manualCI',thisCI); %recursive call
+       [h(ii),s(ii)]=notBoxPlot(y(f),u(ii),varargin{:},'manualCI',thisCI); %recursive call
     end
 
 
@@ -274,9 +279,14 @@ if isvector(y) && isvector(x) && length(x)>1
         set(gca,'XTick',u)
     end
 
-    if nargout==1
+    if nargout>0
         varargout{1}=h;
     end
+    if nargout>1
+        varargout{2}=s;
+    end
+
+
 
     %If we had a table we can label the axes
     if tableOrModelCall
@@ -289,7 +299,6 @@ end
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 
-
 if length(x) ~= size(y,2)
     error('length of x doesn''t match the number of columns in y')
 end
@@ -297,13 +306,12 @@ end
 
 
 
-%We're going to render points with the same x value in different
-%colors so we loop through all unique x values and do the plotting
-%with nested functions. No clf in order to give the user more
-%flexibility in combining plot elements.
+% We're going to render points with the same x value in different
+% colors so we loop through all unique x values and do the plotting
+% with nested functions. Avoid clearing the axes in order to give
+% the user more flexibility in combining plot elements.
 hold on
 [uX,a,b]=unique(x);
-
 
 H=[];
 stats=[];
@@ -351,13 +359,13 @@ function [h,statsOut]=myPlotter(X,Y)
     % NaNs do not contribute to the sample size
     if ~any(isnan(Y(:)))
         % So we definitely have no problems with older MATLAB releases or non-stats toolbox installs
-        SD=std(Y)*numSDs; 
+        SD=std(Y)*numSDs;
         mu=mean(Y);
         if markMedian
            med = median(Y);
         end
     elseif ~verLessThan('matlab','9.0') %from this version onwards we use the omitnan flag
-        SD=std(Y,'omitnan')*numSDs; 
+        SD=std(Y,'omitnan')*numSDs;
         mu=mean(Y,'omitnan');
         if markMedian
            med = median(Y,'omitnan');
@@ -389,7 +397,6 @@ function [h,statsOut]=myPlotter(X,Y)
         statsOut(k).interval = SEM(k);
         statsOut(k).sd = SD(k);
 
-
         %Add the SD as a patch if the user asked for this
         if strcmp(style,'patch') 
             h(k).sdPtch=patchMaker(SD(k),[0.6,0.6,1]);
@@ -407,15 +414,12 @@ function [h,statsOut]=myPlotter(X,Y)
             end
         end
 
-        %Overlay the jittered raw data
+        % Generate scatter in X
+        thisX=violaPoints(thisX,thisY);
         C=cols(k,:);
-        J=(rand(size(thisX))-0.5)*jitter;
 
-%         h(k).data=plot(thisX+J, thisY, 'o', 'color', C,...
-%                        'markerfacecolor', C+(1-C)*0.65);
-        h(k).data = scatter(thisX+J, thisY, 'MarkerEdgeColor', C,...
-            'Marker', 'o', 'MarkerFaceColor', C+(1-C)*0.65);
-                   
+        h(k).data=plot(thisX, thisY, 'o', 'color', C,...
+                       'markerfacecolor', C+(1-C)*0.65);
     end  %for k=1:length(X)
 
 
@@ -456,20 +460,33 @@ function [h,statsOut]=myPlotter(X,Y)
 
 
 
-    function ptch=patchMaker(thisInterval,color)
+    function ptch=patchMaker(thisInterval,tColor)
         %This nested function builds a patch for the SD or SEM
         l=mu(k)-thisInterval;
         u=mu(k)+thisInterval;
         ptch=patch([X(k)-jitScale, X(k)+jitScale, X(k)+jitScale, X(k)-jitScale],...
                 [l,l,u,u], 0);
-        set(ptch,'edgecolor',color*0.8,'facecolor',color)
+        set(ptch,'edgecolor',tColor*0.8,'facecolor',tColor)
     end %function patchMaker
 
 
+    function X=violaPoints(X,Y)
+        % Variable jitter according to how many points occupy each range of values. 
+        [counts,~,bins] = histcounts(Y,10);
+        inds = find(counts~=0);
+        counts = counts(inds);
 
-end %function myPlotter
+        Xr = X;
+        for jj=1:length(inds)
+            tWidth = jitter * (1-exp(-0.1 * (counts(jj)-1)));
+            xpoints = linspace(-tWidth*0.8, tWidth*0.8, counts(jj));
+            Xr(bins==inds(jj)) = xpoints;
+        end
+        X = X+Xr;
+    end % function violaPoints
 
 
+end % function myPlotter
 
 
 

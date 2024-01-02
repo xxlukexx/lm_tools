@@ -1,4 +1,4 @@
-function histgauss(x, varargin)
+function pl = histgauss(x, varargin)
 
 %     binSize = round((max(x) - min(x)) / 10);
 %     [vals, edges, ~] =...
@@ -15,7 +15,7 @@ function histgauss(x, varargin)
 
     % plot
 %     set(gca, 'colororderindex', comp)
-    plot(edges, f(edges), varargin{:})
+    pl = plot(edges, f(edges), varargin{:});
     
     set(gca, 'YTickLabels', [])
     yl = ylim;

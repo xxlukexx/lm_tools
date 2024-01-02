@@ -1,5 +1,5 @@
 function found = findFilename(fileName, filePath)
-    warning('This function is now called lm_findFilename')
+%     warning('This function is now called lm_findFilename')
     found = lm_findFilename(fileName, filePath);
 %     d = jdir(filePath);
 %     found = {};

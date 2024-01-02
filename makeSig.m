@@ -3,6 +3,10 @@ function [sig, sig_u, sig_i, sig_s, numSig] = makeSig(tab, vars, sep)
     if ~exist('sep', 'var')
         sep = '#';
     end
+    
+    if ~iscell(vars)
+        vars = {vars};
+    end
 
     numRows = size(tab, 1);
     numVars = length(vars);

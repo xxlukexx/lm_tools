@@ -1,6 +1,8 @@
 function sl = dirsloc(pth)
 
     allFiles = recdir(pth);
+    [~, ~, ext] = cellfun(@fileparts, allFiles, 'UniformOutput', false);
+    allFiles = allFiles(strcmpi(ext, '.m'));
     sl = 0;
     for i = 1:length(allFiles)
         try
