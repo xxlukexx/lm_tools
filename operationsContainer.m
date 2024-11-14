@@ -10,10 +10,18 @@ classdef operationsContainer < handle
     
     methods
         
-        function obj = operationsContainer
+        function obj = operationsContainer(s)
             
             % init private internal storage
-            obj.s = struct;
+            if exist('s', 'var') 
+                if ~isstruct(s)
+                    error('Must pass a struct or nothing')
+                else
+                    obj.s = s;
+                end
+            else
+                obj.s = struct;
+            end
             obj.Warnings = {};
             
         end
@@ -31,7 +39,16 @@ classdef operationsContainer < handle
         
         function AddWarning(obj, val)
             obj.Warnings{end + 1} = val;
+            warning('%s', val);
         end
+        
+%         function SetIndex(obj, val)
+%             if isfield(obj.s, val)
+%                 obj.Index = val;
+%             else
+%                 error('Index variable does not exist.')
+%             end
+%         end
         
         function obj = subsasgn(obj, s, varargin)
             if length(s) == 1 && strcmpi(s.type, '.')
@@ -46,6 +63,8 @@ classdef operationsContainer < handle
             if length(s) == 2 && strcmpi(s(1).type, '.') &&...
                     strcmpi(s(1).subs, 'AddWarning')
                 obj.Warnings{end + 1} = s(2).subs;
+                fprintf('[operations warning]:%s\n', s(2).subs{1});
+                1 == 1;
             else
                 varargout = {builtin('subsref', obj.s, s)};
             end

@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>Description of nt_back</title>
+  <meta name="keywords" content="nt_back">
+  <meta name="description" content="[iBest,y,topo]=nt_back(x,z,layout) - back-project component">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="generator" content="m2html v1.5 &copy; 2003-2005 Guillaume Flandin">
+  <meta name="robots" content="index, follow">
+  <link type="text/css" rel="stylesheet" href="../m2html.css">
+</head>
+<body>
+<a name="_top"></a>
+<div><a href="../index.html">Home</a> &gt;  <a href="index.html">NoiseTools</a> &gt; nt_back.m</div>
+
+<!--<table width="100%"><tr><td align="left"><a href="../index.html"><img alt="<" border="0" src="../left.png">&nbsp;Master index</a></td>
+<td align="right"><a href="index.html">Index for NoiseTools&nbsp;<img alt=">" border="0" src="../right.png"></a></td></tr></table>-->
+
+<h1>nt_back
+</h1>
+
+<h2><a name="_name"></a>PURPOSE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>[iBest,y,topo]=nt_back(x,z,layout) - back-project component</strong></div>
+
+<h2><a name="_synopsis"></a>SYNOPSIS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="box"><strong>function [iBest,y,topo]=nt_back(x,z,layout) </strong></div>
+
+<h2><a name="_description"></a>DESCRIPTION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre class="comment">[iBest,y,topo]=nt_back(x,z,layout) - back-project component
+
+  iBest: best channel per component 
+  y: data from best channel per component 
+  topoB: amplitude of other channels relative to best 
+
+  x: raw data (timeXchannels pr timeXchannelsXtrials)
+  z: component (timeX1 or timeX1Xtrials)
+  layout: for optional topoplot
+ 
+ NoiseTools</pre></div>
+
+<!-- crossreference -->
+<h2><a name="_cross"></a>CROSS-REFERENCE INFORMATION <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+This function calls:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="nt_back.html" class="code" title="function [iBest,y,topo]=nt_back(x,z,layout)">nt_back</a>	[iBest,y,topo]=nt_back(x,z,layout) - back-project component</li><li><a href="nt_banner.html" class="code" title="function h=nt_banner(text,varargin)">nt_banner</a>	h=nt_banner(text,varargin) - annotate with text at head of figure</li><li><a href="nt_dss1.html" class="code" title="function [todss,pwr0,pwr1,todssX,dX,d]=nt_dss1(x,w,keep1,keep2)">nt_dss1</a>	[todss,pwr0,pwr1]=nt_dss1(x,w,keep1,keep2) - evoked-biased DSS denoising</li><li><a href="nt_fold.html" class="code" title="function x=fold(x,N)">nt_fold</a>	y=fold(x,epochsize) - fold 2D to 3D</li><li><a href="nt_normcol.html" class="code" title="function [y,norm]=nt_normcol(x,w)">nt_normcol</a>	[y,norm]=nt_normcol(x,w) - normalize each column so its weighted msq is 1</li><li><a href="nt_topoplot.html" class="code" title="function nt_topoplot(cfg,data, varargin)">nt_topoplot</a>	nt_topoplot(cfg,data) - simple topoplot</li><li><a href="nt_unfold.html" class="code" title="function x=nt_unfold(x)">nt_unfold</a>	y=nt_fold(x) - unfold 3D to 2D</li><li><a href="nt_xcov.html" class="code" title="function [c,tw]=nt_xcov(x,y,shifts,w);">nt_xcov</a>	[c,tw]=nt_xcov(x,y,shifts,w) - cross-covariance of X and time-shifted Y</li></ul>
+This function is called by:
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="nt_back.html" class="code" title="function [iBest,y,topo]=nt_back(x,z,layout)">nt_back</a>	[iBest,y,topo]=nt_back(x,z,layout) - back-project component</li></ul>
+<!-- crossreference -->
+
+<h2><a name="_subfunctions"></a>SUBFUNCTIONS <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<ul style="list-style-image:url(../matlabicon.gif)">
+<li><a href="#_sub1" class="code">function test_code</a></li></ul>
+
+<h2><a name="_source"></a>SOURCE CODE <a href="#_top"><img alt="^" border="0" src="../up.png"></a></h2>
+<div class="fragment"><pre>0001 <a name="_sub0" href="#_subfunctions" class="code">function [iBest,y,topo]=nt_back(x,z,layout)</a>
+0002 <span class="comment">%[iBest,y,topo]=nt_back(x,z,layout) - back-project component</span>
+0003 <span class="comment">%</span>
+0004 <span class="comment">%  iBest: best channel per component</span>
+0005 <span class="comment">%  y: data from best channel per component</span>
+0006 <span class="comment">%  topoB: amplitude of other channels relative to best</span>
+0007 <span class="comment">%</span>
+0008 <span class="comment">%  x: raw data (timeXchannels pr timeXchannelsXtrials)</span>
+0009 <span class="comment">%  z: component (timeX1 or timeX1Xtrials)</span>
+0010 <span class="comment">%  layout: for optional topoplot</span>
+0011 <span class="comment">%</span>
+0012 <span class="comment">% NoiseTools</span>
+0013 <span class="comment">%</span>
+0014 
+0015 <span class="keyword">if</span> nargin==0; <a href="#_sub1" class="code" title="subfunction test_code">test_code</a>; <span class="keyword">return</span>; <span class="keyword">end</span>
+0016 
+0017 <span class="keyword">if</span> nargin&lt;2; error(<span class="string">'!'</span>); <span class="keyword">end</span>
+0018 <span class="keyword">if</span> nargin&lt;3||isempty(layout); layout=[]; <span class="keyword">end</span>
+0019 <span class="keyword">if</span> ndims(x)~=ndims(z); error(<span class="string">'!'</span>); <span class="keyword">end</span>
+0020 
+0021 <span class="keyword">if</span> ndims(x)==3
+0022     <span class="comment">% 3D: unfold to 2D</span>
+0023     [m,n,o]=size(x);
+0024     x=<a href="nt_unfold.html" class="code" title="function x=nt_unfold(x)">nt_unfold</a>(x);
+0025     z=<a href="nt_unfold.html" class="code" title="function x=nt_unfold(x)">nt_unfold</a>(z);
+0026     <span class="keyword">if</span> nargout~=0
+0027         [iBest,y,topo]=<a href="nt_back.html" class="code" title="function [iBest,y,topo]=nt_back(x,z,layout)">nt_back</a>(x,z,layout);
+0028         y=<a href="nt_fold.html" class="code" title="function x=fold(x,N)">nt_fold</a>(y,m);
+0029     <span class="keyword">else</span>
+0030         <a href="nt_back.html" class="code" title="function [iBest,y,topo]=nt_back(x,z,layout)">nt_back</a>(x,z,layout);
+0031     <span class="keyword">end</span>
+0032     <span class="keyword">return</span>;
+0033 <span class="keyword">end</span>
+0034 
+0035 
+0036 <span class="comment">% correlation with each channel</span>
+0037 z=<a href="nt_normcol.html" class="code" title="function [y,norm]=nt_normcol(x,w)">nt_normcol</a>(z);
+0038 topo=<a href="nt_xcov.html" class="code" title="function [c,tw]=nt_xcov(x,y,shifts,w);">nt_xcov</a>(z,x)/size(x,1); <span class="comment">% non-normalized</span>
+0039 
+0040 <span class="comment">% best channel for each component</span>
+0041 [~,iBest]=max(abs(topo)');
+0042 
+0043 <span class="comment">% back-project each component to its best channel</span>
+0044 <span class="keyword">for</span> iComp=1:size(z,2)
+0045     y(:,iComp)=z(:,iComp)*topo(iComp,iBest(iComp));
+0046 <span class="keyword">end</span>
+0047 
+0048 <span class="comment">% make sure topo has right sign</span>
+0049 <span class="keyword">for</span> iComp=1:size(z,2)
+0050     topo(iComp,:)=topo(iComp,:)*sign(mean(z(:,iComp).*y(:,iComp)));
+0051 <span class="keyword">end</span>
+0052 
+0053 
+0054 
+0055 
+0056 <span class="keyword">if</span> nargout==0
+0057     disp(<span class="string">'nt_back: no output requested, plot back matrices'</span>);
+0058     
+0059     J=floor(sqrt(size(z,2)));
+0060     K=ceil(size(z,2)/J);
+0061 
+0062     figure(101); clf;
+0063     <a href="nt_banner.html" class="code" title="function h=nt_banner(text,varargin)">nt_banner</a>(<span class="string">'best channel for each component'</span>,<span class="string">'fontsize'</span>,16)
+0064     <span class="keyword">for</span> iComp=1:size(z,2)
+0065         subplot(J,K,iComp);
+0066         plot(x(:,iBest(iComp)), <span class="string">':k'</span>); hold on
+0067         plot(y(:,iComp), <span class="string">'b'</span>);
+0068         title([<span class="string">'c'</span>,num2str(iComp), <span class="string">', ch'</span>, num2str(iBest)]);
+0069     <span class="keyword">end</span>
+0070     
+0071     <span class="keyword">if</span> ~isempty(layout)
+0072         figure(102); clf
+0073         <a href="nt_banner.html" class="code" title="function h=nt_banner(text,varargin)">nt_banner</a>(<span class="string">'RMS per channel'</span>,<span class="string">'fontsize'</span>,16)
+0074         <span class="keyword">for</span> iComp=1:size(z,2)
+0075             subplot(J,K,iComp);
+0076             <a href="nt_topoplot.html" class="code" title="function nt_topoplot(cfg,data, varargin)">nt_topoplot</a>(layout, topo(iComp,:)); colorbar
+0077             title(iComp);
+0078         <span class="keyword">end</span>
+0079     <span class="keyword">end</span>
+0080     
+0081     clear iBest y topo
+0082  <span class="keyword">end</span>
+0083 
+0084 
+0085 
+0086 <span class="keyword">end</span> <span class="comment">% function</span>
+0087 
+0088 
+0089 
+0090 
+0091 <span class="comment">% test/example code</span>
+0092 <a name="_sub1" href="#_subfunctions" class="code">function test_code</a>
+0093     disp(<span class="string">'nt_back test code'</span>);
+0094     disp(<span class="string">'3D random matrix, apply nt_dss1, give to nt_back()'</span>);
+0095     
+0096     x=randn(1000,10,10);
+0097     [todss]=<a href="nt_dss1.html" class="code" title="function [todss,pwr0,pwr1,todssX,dX,d]=nt_dss1(x,w,keep1,keep2)">nt_dss1</a>(x);
+0098     <a href="nt_back.html" class="code" title="function [iBest,y,topo]=nt_back(x,z,layout)">nt_back</a>(x,todss)
+0099 <span class="keyword">end</span> <span class="comment">% function</span></pre></div>
+<hr><address>Generated on Sat 29-Apr-2023 17:15:46 by <strong><a href="http://www.artefact.tk/software/matlab/m2html/" title="Matlab Documentation in HTML">m2html</a></strong> &copy; 2005</address>
+</body>
+</html>
